@@ -6,6 +6,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+CommonFunctions.h
+CommonFunctions.cpp
+osgFBO - 副本.cpp
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
