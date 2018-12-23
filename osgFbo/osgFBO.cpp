@@ -7,7 +7,7 @@
 
 int main(int argc, char* argv[])
 {
-	osg::Vec3  viewDirect(0.0, 0.0, 1.0);
+	osg::Vec3d  viewDirect(0.0, 0.0, 1.0);
 
 	osg::ref_ptr<osg::Node> node = osgDB::readNodeFile("dumptruck.osgt");
 

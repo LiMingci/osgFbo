@@ -26,8 +26,8 @@ CompareMeshOutline::CreateRttCamera(unsigned int texWidth, unsigned int texHeigh
 	double viewDistance = bs.radius();
 	double znear = viewDistance;
 	double zfar = viewDistance * 2.0;
-	float top = bs.radius();
-	float right = bs.radius();
+	double top = bs.radius();
+	double right = bs.radius();
 	if (useortho)
 	{
 		rttCamera->setProjectionMatrixAsOrtho(-right, right, -top, top, znear, zfar);
@@ -47,9 +47,9 @@ CompareMeshOutline::CreateRttCamera(unsigned int texWidth, unsigned int texHeigh
 
 }
 
-std::vector<osg::Vec3> CompareMeshOutline::CreateViewDirect(unsigned int numDirect)
+std::vector<osg::Vec3d> CompareMeshOutline::CreateViewDirect(unsigned int numDirect)
 {
-	std::vector<osg::Vec3> result;
+	std::vector<osg::Vec3d> result;
 	double eps = 1e-6;
 
 	double detAngle = 2.0 * osg::PI / numDirect;
@@ -65,7 +65,7 @@ std::vector<osg::Vec3> CompareMeshOutline::CreateViewDirect(unsigned int numDire
 			if (abs(coordX) < eps) coordX = 0.0;
 			if (abs(coordY) < eps) coordY = 0.0;
 
-			osg::Vec3 tempDirection(coordX, coordY, coordZ);
+			osg::Vec3d tempDirection(coordX, coordY, coordZ);
 			bool isInsert = true;
 			for (unsigned int k = 0; k < result.size(); k++)
 			{
@@ -88,24 +88,24 @@ std::vector<osg::Vec3> CompareMeshOutline::CreateViewDirect(unsigned int numDire
 }
 
 
-osg::Vec3 CompareMeshOutline::CreateUpDirectFromViewDirect(const osg::Vec3& viewDirect)
+osg::Vec3d CompareMeshOutline::CreateUpDirectFromViewDirect(const osg::Vec3d& viewDirect)
 {
-	osg::Vec3 nz(0.0, 0.0, 1.0);
+	osg::Vec3d nz(0.0, 0.0, 1.0);
 
-	osg::Vec3 nx = nz ^ viewDirect;
+	osg::Vec3d nx = nz ^ viewDirect;
 
 	if (nx.length2() < 1e-6)
 	{
-		nx = osg::Vec3(1.0, 0.0, 0.0);
+		nx = osg::Vec3d(1.0, 0.0, 0.0);
 	}
 
-	osg::Vec3 upDirect = viewDirect ^ nx;
+	osg::Vec3d upDirect = viewDirect ^ nx;
 
 	return upDirect;
 }
 
 std::vector<osg::ref_ptr<osg::Image>>
-CompareMeshOutline::GetImageFromView(osg::Node* node, std::vector<osg::Vec3> viewDirects, unsigned int width, unsigned int height)
+CompareMeshOutline::GetImageFromView(osg::Node* node, std::vector<osg::Vec3d> viewDirects, unsigned int width, unsigned int height)
 {
 	std::vector<osg::ref_ptr<osg::Image>> result;
 
@@ -141,11 +141,11 @@ CompareMeshOutline::GetImageFromView(osg::Node* node, std::vector<osg::Vec3> vie
 
 	for (std::size_t i = 0; i < viewDirects.size(); i++)
 	{
-		osg::Vec3 viewDirect = viewDirects[i];
-		osg::Vec3 upDirect = CreateUpDirectFromViewDirect(viewDirect);
+		osg::Vec3d viewDirect = viewDirects[i];
+		osg::Vec3d upDirect = CreateUpDirectFromViewDirect(viewDirect);
 
-		osg::Vec3 center = bs.center();
-		osg::Vec3 eyePoint = center + viewDirect * center.length() * 2.0;
+		osg::Vec3d center = bs.center();
+		osg::Vec3d eyePoint = center + viewDirect * center.length() * 2.0;
 		rttCamera->setViewMatrixAsLookAt(eyePoint, center, upDirect);
 
 		viewer->frame();
@@ -158,9 +158,9 @@ CompareMeshOutline::GetImageFromView(osg::Node* node, std::vector<osg::Vec3> vie
 
 }
 
-osg::Image* CompareMeshOutline::GetImageFromView(osg::Node* node, osg::Vec3 viewDirect, unsigned int width, unsigned int height)
+osg::Image* CompareMeshOutline::GetImageFromView(osg::Node* node, osg::Vec3d viewDirect, unsigned int width, unsigned int height)
 {
-	std::vector<osg::Vec3> viewDirects;
+	std::vector<osg::Vec3d> viewDirects;
 	viewDirects.push_back(viewDirect);
 
 	std::vector<osg::ref_ptr<osg::Image>> result = GetImageFromView(node, viewDirects, width, height);
