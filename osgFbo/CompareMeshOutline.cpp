@@ -11,7 +11,7 @@ CompareMeshOutline::~CompareMeshOutline()
 {
 }
 
-osg::Camera* 
+osg::Camera*
 CompareMeshOutline::CreateRttCamera(unsigned int texWidth, unsigned int texHeight, const osg::BoundingSphere& bs, bool useortho)
 {
 	osg::ref_ptr<osg::Camera> rttCamera = new osg::Camera();
@@ -24,13 +24,13 @@ CompareMeshOutline::CreateRttCamera(unsigned int texWidth, unsigned int texHeigh
 
 
 	double viewDistance = bs.radius();
-	double znear = viewDistance ;
+	double znear = viewDistance;
 	double zfar = viewDistance * 2.0;
 	float top = bs.radius();
 	float right = bs.radius();
 	if (useortho)
 	{
-		rttCamera->setProjectionMatrixAsOrtho(-right, right, -top, top,	znear, zfar);
+		rttCamera->setProjectionMatrixAsOrtho(-right, right, -top, top, znear, zfar);
 	}
 	else
 	{
@@ -123,15 +123,19 @@ CompareMeshOutline::GetImageFromView(osg::Node* node, std::vector<osg::Vec3> vie
 	traits->windowDecoration = true;
 	traits->pbuffer = true;
 	traits->doubleBuffer = true;
+	//traits->samples = 16;
 	osg::ref_ptr<osg::GraphicsContext> gc = osg::GraphicsContext::createGraphicsContext(traits.get());
 	rttCamera->setGraphicsContext(gc.get());
 
 	osg::ref_ptr<osg::Image> image = new osg::Image();
 	image->allocateImage(width, height, 1, GL_RGB, GL_UNSIGNED_BYTE);
-	rttCamera->attach(osg::Camera::COLOR_BUFFER, image.get());
+	rttCamera->attach(osg::Camera::COLOR_BUFFER, image.get(), 16);
 
 	osg::ref_ptr<osgViewer::Viewer> viewer = new osgViewer::Viewer();
 	viewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
+	//osg::ref_ptr< osg::DisplaySettings > displaySettings = new osg::DisplaySettings;
+	//displaySettings->setNumMultiSamples(8);
+	//viewer->setDisplaySettings(displaySettings.get());
 	viewer->addSlave(rttCamera.get());
 	viewer->setSceneData(node);
 
@@ -163,3 +167,23 @@ osg::Image* CompareMeshOutline::GetImageFromView(osg::Node* node, osg::Vec3 view
 
 	return result[0].release();
 }
+
+cv::Mat CompareMeshOutline::ConvOsgImage2CvMat(const osg::Image* osgimage)
+{
+	if (osgimage == nullptr)
+	{
+		return cv::Mat(0, 0, CV_8UC3);
+	}
+
+	cv::Mat result(osgimage->t(), osgimage->s(), CV_8UC3);
+	result.data = (uchar *)osgimage->data();
+	cv::flip(result, result, 0); 
+	cv::cvtColor(result, result, cv::COLOR_RGB2BGR);
+
+	return result;
+}
+
+//osg::Image* CompareMeshOutline::ConvCvMat2OsgImage(const cv::Mat& cvmat)
+//{
+//	return nullptr;
+//}

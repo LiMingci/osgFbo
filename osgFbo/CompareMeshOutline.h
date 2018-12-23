@@ -12,6 +12,9 @@
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerBase>
 
+#include <opencv2/opencv.hpp>
+#include<opencv2/highgui/highgui.hpp>
+
 class CompareMeshOutline
 {
 public:
@@ -30,6 +33,10 @@ public:
 		GetImageFromView(osg::Node* node, std::vector<osg::Vec3> viewDirects, unsigned int width, unsigned int height);
 
 	static osg::Image* GetImageFromView(osg::Node* node, osg::Vec3 viewDirect, unsigned int width, unsigned int height);
+
+	static cv::Mat ConvOsgImage2CvMat(const osg::Image* osgimage);
+
+	//static osg::Image* ConvCvMat2OsgImage(const cv::Mat& cvmat);
 
 private:
 

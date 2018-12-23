@@ -9,11 +9,18 @@ int main(int argc, char* argv[])
 {
 	osg::Vec3  viewDirect(0.0, 0.0, 1.0);
 
-	osg::ref_ptr<osg::Node> node = osgDB::readNodeFile(argv[1]);
+	osg::ref_ptr<osg::Node> node = osgDB::readNodeFile("dumptruck.osgt");
 
-	osg::ref_ptr<osg::Image> image = CompareMeshOutline::GetImageFromView(node, viewDirect, 1024, 1024);
+	osg::ref_ptr<osg::Image> image = CompareMeshOutline::GetImageFromView(node, viewDirect, 4096, 4096);
 
-	osgDB::writeImageFile(*(image.get()), std::string(argv[2]));
+	osgDB::writeImageFile(*(image.get()), std::string("rtt.bmp"));
+
+	cv::Mat mat = CompareMeshOutline::ConvOsgImage2CvMat(image.get());
+
+	std::vector<int> compress;
+	compress.push_back(cv::IMWRITE_JPEG_QUALITY);
+	compress.push_back(100);
+	cv::imwrite("rtt.jpg", mat, compress);
 
 	return 0;
 }
